@@ -34,7 +34,7 @@ fun HomePageScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Welcome, ${homePageViewModel.getUserName()}")
-            Text(text = "Email: ${homePageViewModel.getEmail()}")
+            //Text(text = "Email: ${homePageViewModel.getEmail()}")
             Spacer(modifier = Modifier.height(16.dp))
 
             // För Explore-knappen (Search ikon)
