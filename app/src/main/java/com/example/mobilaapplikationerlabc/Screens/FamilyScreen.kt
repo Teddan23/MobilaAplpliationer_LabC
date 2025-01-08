@@ -37,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel = viewModel()) {
     val family by familyViewModel.familyFlow.collectAsState()
     val leaveFamilySuccess by familyViewModel.leaveFamilySuccess.collectAsState()
+    val documentId by familyViewModel.documentIdFlow.collectAsState()
 
     // Hämta familjen när skärmen öppnas
     LaunchedEffect(Unit) {
@@ -57,12 +58,22 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Centrera texten i Box
-                        Text(
-                            text = family?.name ?: "Family",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        // Centrera både familjenamnet och dokument-ID i en Column
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally // Centrera texten horisontellt
+                        ) {
+                            Text(
+                                text = family?.name ?: "Family",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+
+                            Text(
+                                text = documentId ?: "Document ID",
+                                style = MaterialTheme.typography.bodySmall, // Mindre text för dokument-ID
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) // Ljusare färg för sekundär text
+                            )
+                        }
 
                         // Placera navigation-ikonen till vänster
                         IconButton(
@@ -74,7 +85,6 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                     }
                 }
             )
-
         },
         content = { paddingValues ->
             Column(

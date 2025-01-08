@@ -21,6 +21,9 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
     private val auth = FirebaseAuth.getInstance() // Definieras här som instansvariabel
     private val db = FirebaseFirestore.getInstance() // Definieras här som instansvariabel
 
+    private val _documentIdFlow = MutableStateFlow<String?>(null)
+    val documentIdFlow: StateFlow<String?> = _documentIdFlow
+
     fun fetchCurrentUserFamily() {
         val currentUserId = auth.currentUser?.uid ?: return
 
@@ -31,15 +34,18 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
                     // Hämta den första familjen som matchar användarens UID
+                    val familyDocument = querySnapshot.documents[0]
                     val family = querySnapshot.documents[0].toObject(Family::class.java)
                     family?.let {
                         // Uppdatera flödet med den hittade familjen
                         _familyFlow.value = it
+                        _documentIdFlow.value = familyDocument.id
                     }
                 }
             }
             .addOnFailureListener {
                 _familyFlow.value = null // Om hämtningen misslyckas
+                _documentIdFlow.value = null
             }
     }
 
