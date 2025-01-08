@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "969162192870",
+    "project_id": "mobilaapplikationerlabc",
+    "storage_bucket": "mobilaapplikationerlabc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969162192870:android:3911af5c82a56bf95a0827",
+        "android_client_info": {
+          "package_name": "com.example.mobilaapplikationerlabc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "969162192870-jubefpmf17kd9e64je6d4v3npfoevg84.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mobilaapplikationerlabc",
+            "certificate_hash": "3bf8f7c8ae80c56d50db987e36a93ad5b9a8ab57"
+          }
+        },
+        {
+          "client_id": "969162192870-9mdfet2vdtas9907la28sskmv54hmcea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmaG5X1q9MemisddAZvZw4L-xKzw3gjXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "969162192870-2ppgjrq2fnjm900ftkj2c4067um4tlsh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
