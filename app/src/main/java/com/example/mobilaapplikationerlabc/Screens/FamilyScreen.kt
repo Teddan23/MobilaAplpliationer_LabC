@@ -119,7 +119,7 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                     horizontalArrangement = Arrangement.Start // Justera knapparna så de ligger ihop utan mellanrum
                 ) {
                     Button(
-                        onClick = { /* TODO: Action for button 1 */ },
+                        onClick = { navController.navigate("familyRecipes") },
                         modifier = Modifier
                             .weight(1f) // Gör knappen fyrkantig genom att fylla höjden och bredden
                             .fillMaxHeight()

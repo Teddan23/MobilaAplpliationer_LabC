@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mobilaapplikationerlabc.Screens.ExploreScreen
 import com.example.mobilaapplikationerlabc.Screens.FamilyCartScreen
+import com.example.mobilaapplikationerlabc.Screens.FamilyRecipesScreen
 import com.example.mobilaapplikationerlabc.Screens.FamilyScreen
 import com.example.mobilaapplikationerlabc.Screens.NoFamilyScreen
 import com.example.mobilaapplikationerlabc.Screens.HomePageScreen
@@ -53,6 +54,9 @@ fun NavigationHost(
         }
         composable("familyCart") {
             FamilyCartScreen(navController = navController) // Explore-skärmen
+        }
+        composable("familyRecipes") {
+            FamilyRecipesScreen(navController = navController) // Explore-skärmen
         }
     }
 }
