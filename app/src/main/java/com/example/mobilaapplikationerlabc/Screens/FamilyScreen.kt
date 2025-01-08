@@ -39,9 +39,14 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
     val leaveFamilySuccess by familyViewModel.leaveFamilySuccess.collectAsState()
     val documentId by familyViewModel.documentIdFlow.collectAsState()
 
+    //var isLoading by remember { mutableStateOf(true) }
+    val isLoading by familyViewModel.isLoading.collectAsState()
+
     // Hämta familjen när skärmen öppnas
     LaunchedEffect(Unit) {
         familyViewModel.fetchCurrentUserFamily()
+        //kotlinx.coroutines.delay(500) // Simulera kort laddningstid
+        //isLoading = false
 
     }
     if (leaveFamilySuccess) {
@@ -95,13 +100,19 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                if (family == null || family?.members.isNullOrEmpty()) {
-                    Text(text = "No members in your family.")
-                } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(family!!.members) { memberUid ->
-                            Spacer(modifier = Modifier.width(16.dp))
-                            MemberRow(memberUid = memberUid)
+
+                if(isLoading){
+                    CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center))
+                }
+                else{
+                    if (family == null || family?.members.isNullOrEmpty()) {
+                        Text(text = "No members in your family.")
+                    } else {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(family!!.members) { memberUid ->
+                                Spacer(modifier = Modifier.width(16.dp))
+                                MemberRow(memberUid = memberUid)
+                            }
                         }
                     }
                 }
@@ -182,6 +193,7 @@ fun MemberRow(memberUid: String) {
     // Skapa MutableState för att lagra användarens namn och e-post
     var memberName by remember { mutableStateOf("Loading...") }
     var memberEmail by remember { mutableStateOf("Loading...") }
+    var isLoading by remember { mutableStateOf(true) }
 
     // Hämta användarens information
     LaunchedEffect(memberUid) {
@@ -194,11 +206,13 @@ fun MemberRow(memberUid: String) {
                     memberName = "No Name"
                     memberEmail = "No Email"
                 }
+                isLoading = false
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Error fetching user data", e)
                 memberName = "Error"
                 memberEmail = "Error"
+                isLoading = false
             }
     }
 
@@ -208,15 +222,20 @@ fun MemberRow(memberUid: String) {
             .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            text = memberName,
-            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp) // Öka textstorleken här
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = memberEmail,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        if(isLoading){
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        }
+        else{
+            Text(
+                text = memberName,
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp) // Öka textstorleken här
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = memberEmail,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
