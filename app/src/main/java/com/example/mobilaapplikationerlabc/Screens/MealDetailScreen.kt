@@ -32,6 +32,7 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
     var meal by remember { mutableStateOf<Meal?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isFavorite by remember { mutableStateOf(false) }
 
     // Setup Retrofit (som tidigare)
     val retrofit = Retrofit.Builder()
@@ -46,6 +47,11 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
             override fun onResponse(call: Call<MealResponse>, response: Response<MealResponse>) {
                 if (response.isSuccessful) {
                     meal = response.body()?.meals?.firstOrNull()
+                    meal?.let {
+                        viewModel.checkIfMealIsInFamily(it.idMeal) { isInFamily ->
+                            isFavorite = isInFamily // Uppdatera om måltiden är i familjens lista direkt.
+                        }
+                    }
                 } else {
                     errorMessage = "No meal details found."
                 }
@@ -106,15 +112,22 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                         //Favorite button
                         // Favorite button
                         item {
-                            val isFavorite by viewModel.isMealFavorite(mealDetails.idMeal).collectAsState(initial = false)
+                            //val isFavorite by viewModel.isMealFavorite.collectAsState(initial = false)
 
                             Button(
                                 onClick = {
                                     if (isFavorite) {
+                                        // Om måltiden är i favoriter, ta bort den från familjens lista
                                         viewModel.removeFromFavorites(mealDetails)
                                     } else {
-                                        viewModel.addToFavorites(mealDetails)
+                                        // Om måltiden inte är i favoriter, lägg till den i familjens lista
+                                        viewModel.saveMeal(mealDetails)
                                     }
+                                    // Uppdatera om måltiden finns i familjens lista efter knapptryck
+                                    /*viewModel.checkIfMealIsInFamily(mealDetails.idMeal) { isInFamily ->
+                                        isFavorite = isInFamily
+                                    }*/
+                                    isFavorite = !isFavorite
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
