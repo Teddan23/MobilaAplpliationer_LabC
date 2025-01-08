@@ -85,7 +85,7 @@ fun SimpleMealItem(meal: SimpleMeal, navController: NavController) {
             .padding(8.dp)
             .clickable {
                 // Navigera till detaljskärmen när användaren klickar på måltiden
-                navController.navigate("mealDetail/${meal.strMeal}")
+                navController.navigate("mealDetail/${meal.idMeal}")
             }
     ) {
         Text(text = meal.strMeal, style = MaterialTheme.typography.bodyLarge)

@@ -55,8 +55,9 @@ class FamilyRecipesViewModel(application: Application) : AndroidViewModel(applic
                     .mapNotNull { document ->
                         val strCategory = document["strCategory"] as? String
                         val strMeal = document["strMeal"] as? String
+                        val idMeal = document.id
                         if (strCategory != null && strMeal != null) {
-                            SimpleMeal(strCategory, strMeal) // Skapa en enklare representation av Meal
+                            SimpleMeal(idMeal, strCategory, strMeal) // Skapa en enklare representation av Meal
                         } else {
                             null // Om nödvändiga fält saknas, ignorera dokumentet
                         }
