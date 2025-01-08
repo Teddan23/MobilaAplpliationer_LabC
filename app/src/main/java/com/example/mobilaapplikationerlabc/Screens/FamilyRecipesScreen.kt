@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -28,8 +29,11 @@ import com.example.mobilaapplikationerlabc.ViewModels.FamilyRecipesViewModel
 import com.example.mobilaapplikationerlabc.ViewModels.FamilyViewModel
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import com.example.mobilaapplikationerlabc.DataClasses.SimpleMeal
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,10 +43,9 @@ fun FamilyRecipesScreen(
     navController: NavController,
     familyRecipesViewModel: FamilyRecipesViewModel = viewModel()
 ) {
-    // Hämta recepten från viewmodel
+    val isLoading by familyRecipesViewModel.isLoading.collectAsState()
     val recipes by familyRecipesViewModel.recipesFlow.collectAsState()
 
-    // Kör fetch när skärmen öppnas
     LaunchedEffect(Unit) {
         familyRecipesViewModel.fetchFamilyRecipes()
     }
@@ -50,24 +53,45 @@ fun FamilyRecipesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Family Recipes") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Family Recipes",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )
-        },
-        content = {
-            if (recipes.isEmpty()) {
+        }
+,
+        content = { paddingValues ->
+            if(isLoading){
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            else if (recipes.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No recipes found.")
                 }
             } else {
-                LazyColumn(modifier = Modifier.padding(16.dp)) {
+                LazyColumn(modifier = Modifier.padding(16.dp).padding(top = paddingValues.calculateTopPadding())) {
                     items(recipes) { recipe ->
                         SimpleMealItem(meal = recipe, navController = navController)
                     }
@@ -84,15 +108,21 @@ fun SimpleMealItem(meal: SimpleMeal, navController: NavController) {
         modifier = Modifier
             .padding(8.dp)
             .clickable {
-                // Navigera till detaljskärmen när användaren klickar på måltiden
                 navController.navigate("mealDetail/${meal.idMeal}")
             }
     ) {
-        Text(text = meal.strMeal, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = meal.strMeal,
+            style = TextStyle(fontSize = 23.sp)
+        )
+
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = meal.strCategory, style = MaterialTheme.typography.bodySmall)
+
+        Text(
+            text = meal.strCategory,
+            style = TextStyle(fontSize = 14.sp)
+            )
         Spacer(modifier = Modifier.height(4.dp))
-        // Här kan du även lägga till andra attribut om det behövs (t.ex. bild)
     }
 }
 

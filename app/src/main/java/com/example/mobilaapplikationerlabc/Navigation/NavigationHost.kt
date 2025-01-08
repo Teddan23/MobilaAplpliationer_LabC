@@ -34,29 +34,29 @@ fun NavigationHost(
         }
         composable("home") {
             Log.d("Navigation", "Navigating to home screen")
-            HomePageScreen(navController = navController) // Om användaren är inloggad, kommer den hit
+            HomePageScreen(navController = navController)
         }
         composable("family") {
             FamilyScreen(navController = navController)
         }
         composable("noFamily") {
-            NoFamilyScreen(navController = navController) // För skärmen utan familj
+            NoFamilyScreen(navController = navController)
         }
         composable("explore") {
-            ExploreScreen(navController = navController) // Explore-skärmen
+            ExploreScreen(navController = navController)
         }
         composable("mealDetail/{mealId}") { backStackEntry ->
             val mealId = backStackEntry.arguments?.getString("mealId") ?: ""
             MealDetailScreen(mealId = mealId, navController = navController, viewModel = viewModel())
         }
         composable("random"){
-            RandomScreen(navController = navController) //Surprise Me-skärmen
+            RandomScreen(navController = navController)
         }
         composable("familyCart") {
-            FamilyCartScreen(navController = navController) // Explore-skärmen
+            FamilyCartScreen(navController = navController)
         }
         composable("familyRecipes") {
-            FamilyRecipesScreen(navController = navController) // Explore-skärmen
+            FamilyRecipesScreen(navController = navController)
         }
     }
 }

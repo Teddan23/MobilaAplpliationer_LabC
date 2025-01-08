@@ -26,14 +26,11 @@ fun LoginScreen(
     loginViewModel: LoginViewModel,
     navController: NavController
 ) {
-    // Hantera Google inloggning
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         loginViewModel.handleSignInResult(task) { success, displayName ->
             if (success) {
-                // Navigera till hem-sidan om inloggningen lyckades
                 navController.navigate("home") {
-                    // Förhindra att användaren kan gå tillbaka till login-sidan
                     popUpTo("login") { inclusive = true }
                 }
             } else {
@@ -42,7 +39,6 @@ fun LoginScreen(
         }
     }
 
-    // Visa login-knappen om användaren inte är inloggad
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier
@@ -51,13 +47,11 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Texten "Logga in med"
             Text(
                 text = "Logga in med",
-                modifier = Modifier.padding(bottom = 16.dp) // Skapa ett mellanrum under texten
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Rad med alternativ (just nu bara Google)
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -69,9 +63,8 @@ fun LoginScreen(
                 ) {
                     // Visa Google-ikonen
                     Image(
-                        painter = painterResource(id = R.drawable.google_logo), // Använd din SVG-konverterade fil här
-                        contentDescription = "Google SignIn"//,
-                        //modifier = Modifier.size(0.dp) // Justera storleken på ikonen
+                        painter = painterResource(id = R.drawable.google_logo),
+                        contentDescription = "Google SignIn"
                     )
                 }
             }

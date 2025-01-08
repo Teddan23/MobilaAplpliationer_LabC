@@ -20,7 +20,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("969162192870-9mdfet2vdtas9907la28sskmv54hmcea.apps.googleusercontent.com") // Se till att du använder din klient-ID här
+            .requestIdToken("969162192870-9mdfet2vdtas9907la28sskmv54hmcea.apps.googleusercontent.com")
             .requestEmail()
             .build()
 
@@ -30,10 +30,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val isUserLoggedIn: Boolean
         get() = firebaseAuth.currentUser != null
 
-    // Starta sign-in processen
     fun signInWithGoogleIntent(): Intent = googleSignInClient.signInIntent
 
-    // Hantera resultatet från Google Sign-In
     fun handleSignInResult(task: Task<GoogleSignInAccount>, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
@@ -47,7 +45,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Firebase-auth med Google
     private fun firebaseAuthWithGoogle(idToken: String, onResult: (Boolean, String?) -> Unit) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         firebaseAuth.signInWithCredential(credential)

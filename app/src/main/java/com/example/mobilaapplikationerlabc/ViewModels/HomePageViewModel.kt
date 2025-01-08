@@ -15,7 +15,6 @@ class HomePageViewModel : ViewModel() {
     }
 
     init {
-        // Kör metoden för att lägga till användaren i databasen om det behövs när ViewModel skapas
         addUserToDbIfNeeded()
     }
 
@@ -44,24 +43,20 @@ class HomePageViewModel : ViewModel() {
         val currentUser = auth.currentUser
 
         if (currentUser != null) {
-            // Hämta UID för den inloggade användaren
             val userId = currentUser.uid
 
-            // Kontrollera om det finns någon familj där användaren finns i medlemmarna
             db.collection("families")
-                .whereArrayContains("members", userId)  // Filtrera på familjer där "members" innehåller användarens UID
+                .whereArrayContains("members", userId)
                 .get()
                 .addOnSuccessListener { documents ->
-                    // Om vi hittar dokument, betyder det att användaren är medlem i åtminstone en familj
-                    val userFoundInFamily = !documents.isEmpty  // Vi använder isEmpty() istället för isNotEmpty
+                    val userFoundInFamily = !documents.isEmpty
                     onComplete(userFoundInFamily)
                 }
                 .addOnFailureListener {
-                    // Om ett fel inträffar, returnera false
                     onComplete(false)
                 }
         } else {
-            onComplete(false) // Om användaren inte är inloggad, returnera false
+            onComplete(false)
         }
     }
 
@@ -73,13 +68,10 @@ class HomePageViewModel : ViewModel() {
         if (user != null) {
             val userRef = db.collection("users").document(user.uid)
 
-            // Kolla om användaren redan finns i databasen
             userRef.get().addOnSuccessListener { document ->
                 if (document.exists()) {
-                    // Användaren finns redan i databasen
                     Log.d("Firestore", "User already exists in the database")
                 } else {
-                    // Användaren finns inte, så vi lägger till dem
                     val userMap = hashMapOf(
                         "name" to user.displayName,
                         "email" to user.email

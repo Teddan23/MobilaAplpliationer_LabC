@@ -15,11 +15,11 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
     private val _familyFlow = MutableStateFlow<Family?>(null)
     val familyFlow: StateFlow<Family?> = _familyFlow.asStateFlow()
 
-    private val _leaveFamilySuccess = MutableStateFlow(false) // Indikator för om användaren har lämnat familjen
+    private val _leaveFamilySuccess = MutableStateFlow(false)
     val leaveFamilySuccess: StateFlow<Boolean> = _leaveFamilySuccess.asStateFlow()
 
-    private val auth = FirebaseAuth.getInstance() // Definieras här som instansvariabel
-    private val db = FirebaseFirestore.getInstance() // Definieras här som instansvariabel
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     private val _documentIdFlow = MutableStateFlow<String?>(null)
     val documentIdFlow: StateFlow<String?> = _documentIdFlow
@@ -38,11 +38,9 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
             .addOnSuccessListener { querySnapshot ->
                 _isLoading.value = false
                 if (!querySnapshot.isEmpty) {
-                    // Hämta den första familjen som matchar användarens UID
                     val familyDocument = querySnapshot.documents[0]
                     val family = querySnapshot.documents[0].toObject(Family::class.java)
                     family?.let {
-                        // Uppdatera flödet med den hittade familjen
                         _familyFlow.value = it
                         _documentIdFlow.value = familyDocument.id
                     }
@@ -50,28 +48,26 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
             }
             .addOnFailureListener {
                 _isLoading.value = false
-                _familyFlow.value = null // Om hämtningen misslyckas
+                _familyFlow.value = null
                 _documentIdFlow.value = null
             }
     }
 
     fun leaveFamily() {
         val currentUserId = auth.currentUser?.uid ?: return
-        val family = _familyFlow.value // Hämta aktuell familj från _familyFlow
+        val family = _familyFlow.value
 
         family?.let {
-            // Hämta det första dokumentet från Firestore, som vi använde i fetchCurrentUserFamily()
             db.collection("families")
                 .whereArrayContains("members", currentUserId)
                 .get()
                 .addOnSuccessListener { querySnapshot ->
                     if (!querySnapshot.isEmpty) {
-                        val familyDocument = querySnapshot.documents[0] // Hämtar första dokumentet
-                        val familyId = familyDocument.id // Hämta dokumentets ID direkt här
+                        val familyDocument = querySnapshot.documents[0]
+                        val familyId = familyDocument.id
                         val updatedMembers = it.members.toMutableList()
 
                         if (it.members.size == 1) {
-                            // Ta bort hela familjen från Firestore
                             db.collection("families")
                                 .document(familyId)
                                 .delete()
@@ -84,19 +80,16 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
                                 }
                         }
                         else{
-                            // Ta bort användarens UID från "members" listan
                             updatedMembers.remove(currentUserId)
 
-                            // Uppdatera familjens "members" lista i Firestore
                             db.collection("families")
-                                .document(familyId) // Använd dokumentets ID för att identifiera familjen
+                                .document(familyId)
                                 .update("members", updatedMembers)
                                 .addOnSuccessListener {
 
                                     _leaveFamilySuccess.value = true
                                 }
                                 .addOnFailureListener { e ->
-                                    // Hantera eventuella fel vid uppdatering
                                     Log.e("FamilyViewModel", "Error leaving family", e)
                                 }
                         }

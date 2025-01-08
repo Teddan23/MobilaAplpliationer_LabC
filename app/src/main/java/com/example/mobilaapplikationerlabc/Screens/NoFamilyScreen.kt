@@ -40,23 +40,22 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier.fillMaxWidth()  // Gör så att Box fyller hela bredden
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         // Centrera titeln
                         Column(
-                            modifier = Modifier.align(Alignment.Center),  // Centrera innehållet vertikalt och horisontellt
+                            modifier = Modifier.align(Alignment.Center),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Join or Create a Family",  // Titeln du vill visa
+                                text = "Join or Create a Family",
                                 style = MaterialTheme.typography.titleLarge
                             )
                         }
 
-                        // Placera navigation-ikonen till vänster
                         IconButton(
                             onClick = { navController.popBackStack() },
-                            modifier = Modifier.align(Alignment.CenterStart)  // Placera på vänster sida
+                            modifier = Modifier.align(Alignment.CenterStart)
                         ) {
                             Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
@@ -68,9 +67,9 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
         content = { padding ->
             Column(
                 modifier = Modifier
-                    .fillMaxHeight() // Fylla hela höjden på skärmen
-                    .padding(padding), // Använd padding för att hålla avstånd från kanten
-                verticalArrangement = Arrangement.Center // Centrera innehållet vertikalt
+                    .fillMaxHeight()
+                    .padding(padding),
+                verticalArrangement = Arrangement.Center
             ) {
                 // Skapa en familj-sektionen
                 Text(text = "Create a New Family", style = MaterialTheme.typography.titleLarge)
@@ -80,7 +79,7 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
                     onValueChange = { familyName = it },
                     label = { Text("Family Name") }
                 )
-                Spacer(modifier = Modifier.height(24.dp)) // Öka avståndet här mellan fälten
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
                         noFamilyViewModel.createFamily(familyName) { success ->
@@ -97,9 +96,8 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
                     Text(text = "Create Family")
                 }
 
-                Spacer(modifier = Modifier.height(60.dp)) // Mer mellanrum innan nästa sektion
+                Spacer(modifier = Modifier.height(60.dp))
 
-                // Joina en befintlig familj-sektionen
                 Text(text = "Join an Existing Family", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
@@ -107,7 +105,7 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
                     onValueChange = { familyId = it },
                     label = { Text("Family ID") }
                 )
-                Spacer(modifier = Modifier.height(24.dp)) // Öka avståndet här också
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
                         noFamilyViewModel.joinFamily(familyId) { success ->
@@ -119,7 +117,7 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
                             }
                         }
                     },
-                    shape = RoundedCornerShape(4.dp) // Rundade hörn för en mjuk fyrkantig form
+                    shape = RoundedCornerShape(4.dp)
                 ) {
                     Text(text = "Join Family")
                 }

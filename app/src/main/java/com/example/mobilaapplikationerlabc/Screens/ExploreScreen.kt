@@ -34,13 +34,11 @@ import com.example.mobilaapplikationerlabc.model.MealResponse
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ExploreScreen(navController: NavController) {
-    // TextField for searching meal
     var searchQuery by remember { mutableStateOf("") }
     var mealsList by remember { mutableStateOf<List<Meal>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Setup Retrofit
     val retrofit = Retrofit.Builder()
         .baseUrl("https://www.themealdb.com/api/json/v1/1/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -48,7 +46,6 @@ fun ExploreScreen(navController: NavController) {
 
     val service = retrofit.create(TheMealDBService::class.java)
 
-    // Function to handle search
     fun searchMeals(query: String) {
         if (query.isEmpty()) return
 
@@ -71,18 +68,30 @@ fun ExploreScreen(navController: NavController) {
         })
     }
 
-    // UI content
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Explore Screen") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Explore",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )
-        },
+        }
+,
         content = {
             Column(
                 modifier = Modifier
@@ -91,7 +100,6 @@ fun ExploreScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Search TextField
                 TextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -110,7 +118,6 @@ fun ExploreScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Show loading or error
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center))
                 } else if (!mealsList.isNullOrEmpty()) {
@@ -136,7 +143,6 @@ fun MealItem(meal: Meal, navController: NavController) {
         modifier = Modifier
             .padding(8.dp)
             .clickable {
-                // Navigera till detaljskärmen när användaren klickar på måltiden
                 navController.navigate("mealDetail/${meal.idMeal}")
             }
     ) {

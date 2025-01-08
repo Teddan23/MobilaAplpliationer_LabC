@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -39,20 +40,15 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
     val leaveFamilySuccess by familyViewModel.leaveFamilySuccess.collectAsState()
     val documentId by familyViewModel.documentIdFlow.collectAsState()
 
-    //var isLoading by remember { mutableStateOf(true) }
     val isLoading by familyViewModel.isLoading.collectAsState()
 
-    // Hämta familjen när skärmen öppnas
     LaunchedEffect(Unit) {
         familyViewModel.fetchCurrentUserFamily()
-        //kotlinx.coroutines.delay(500) // Simulera kort laddningstid
-        //isLoading = false
 
     }
     if (leaveFamilySuccess) {
-        // När användaren har lämnat familjen, poppa tillbaka på stacken
         LaunchedEffect(leaveFamilySuccess) {
-            navController.popBackStack() // Navigera tillbaka när användaren lämnar familjen
+            navController.popBackStack()
         }
     }
 
@@ -63,10 +59,9 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Centrera både familjenamnet och dokument-ID i en Column
                         Column(
                             modifier = Modifier.align(Alignment.Center),
-                            horizontalAlignment = Alignment.CenterHorizontally // Centrera texten horisontellt
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 text = family?.name ?: "Family",
@@ -74,9 +69,9 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                             )
 
                             Text(
-                                text = documentId ?: "Document ID",
-                                style = MaterialTheme.typography.bodySmall, // Mindre text för dokument-ID
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) // Ljusare färg för sekundär text
+                                text = ("Id: " + (documentId ?: "Document ID")),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                         }
 
@@ -95,8 +90,8 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
             Column(
                 modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Använd Scaffold-padding här
-                .padding(16.dp), // Extra padding inuti
+                .padding(paddingValues)
+                .padding(16.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -122,25 +117,25 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp) // Sätter höjden för bottomBar
+                    .height(80.dp)
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxSize(), // Täcker hela ytan av bottomBar
-                    horizontalArrangement = Arrangement.Start // Justera knapparna så de ligger ihop utan mellanrum
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.Start
                 ) {
                     Button(
                         onClick = { navController.navigate("familyRecipes") },
                         modifier = Modifier
-                            .weight(1f) // Gör knappen fyrkantig genom att fylla höjden och bredden
+                            .weight(1f)
                             .fillMaxHeight()
-                            .padding(0.dp), // Ingen padding mellan knapparna
-                        shape = RectangleShape // Fyrkantig form
+                            .padding(0.dp),
+                        shape = RectangleShape
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Star,
-                            contentDescription = "Star", // Beskrivning för tillgänglighet
-                            modifier = Modifier.size(45.dp),  // Sätt storlek på själva ikonen
+                            contentDescription = "Star",
+                            modifier = Modifier.size(45.dp),
                             tint = Color.Yellow
                         )
                     }
@@ -153,12 +148,12 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                             .weight(1f)
                             .fillMaxHeight()
                             .padding(0.dp),
-                        shape = RectangleShape // Fyrkantig form
+                        shape = RectangleShape
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ShoppingCart,
-                            contentDescription = "Shopping Cart", // Beskrivning för tillgänglighet
-                            modifier = Modifier.size(45.dp) // Justera storleken på ikonen
+                            contentDescription = "Shopping Cart",
+                            modifier = Modifier.size(45.dp)
                         )
                     }
 
@@ -168,12 +163,12 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
                             .weight(1f)
                             .fillMaxHeight()
                             .padding(0.dp),
-                        shape = RectangleShape // Fyrkantig form
+                        shape = RectangleShape
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ExitToApp,
-                            contentDescription = "Exit", // Beskrivning av ikonen för tillgänglighet
-                            modifier = Modifier.size(45.dp),  // Sätt storlek på själva ikonen
+                            contentDescription = "Exit",
+                            modifier = Modifier.size(45.dp),
                             tint = Color.Red
                         )
                     }
@@ -187,15 +182,13 @@ fun FamilyScreen(navController: NavController, familyViewModel: FamilyViewModel 
 
 @Composable
 fun MemberRow(memberUid: String) {
-    val auth = FirebaseAuth.getInstance()
+    //val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
 
-    // Skapa MutableState för att lagra användarens namn och e-post
     var memberName by remember { mutableStateOf("Loading...") }
     var memberEmail by remember { mutableStateOf("Loading...") }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Hämta användarens information
     LaunchedEffect(memberUid) {
         db.collection("users").document(memberUid).get()
             .addOnSuccessListener { document ->
@@ -216,26 +209,46 @@ fun MemberRow(memberUid: String) {
             }
     }
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.Start
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if(isLoading){
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+
         }
         else{
-            Text(
-                text = memberName,
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp) // Öka textstorleken här
+            Icon(
+                imageVector = Icons.Filled.Face,
+                contentDescription = "User Icon",
+                modifier = Modifier
+                    .size(50.dp)
+                    .padding(end = 16.dp),
+                tint = Color.Black
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = memberEmail,
-                style = MaterialTheme.typography.bodyMedium
-            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+
+                Text(
+                    text = memberName,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = memberEmail,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+            }
         }
     }
+
+
 }
 

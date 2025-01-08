@@ -18,6 +18,9 @@ class FamilyCartViewModel(application: Application) : AndroidViewModel(applicati
     private val _shoppingListFlow = MutableStateFlow<List<String>>(emptyList())
     val shoppingListFlow: StateFlow<List<String>> get() = _shoppingListFlow
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
     fun fetchShoppingList() {
         val currentUserUid = auth.currentUser?.uid
         if (currentUserUid == null) {
@@ -26,8 +29,9 @@ class FamilyCartViewModel(application: Application) : AndroidViewModel(applicati
         }
 
         viewModelScope.launch {
+            _isLoading.value = true
             db.collection("families")
-                .whereArrayContains("members", currentUserUid) // Hitta rätt familj
+                .whereArrayContains("members", currentUserUid)
                 .limit(1)
                 .get()
                 .addOnSuccessListener { documents ->
@@ -38,8 +42,10 @@ class FamilyCartViewModel(application: Application) : AndroidViewModel(applicati
                     } else {
                         Log.e("FamilyCartViewModel", "No family found for current user.")
                     }
+                    _isLoading.value = false
                 }
                 .addOnFailureListener { e ->
+                    _isLoading.value = false
                     Log.e("FamilyCartViewModel", "Error fetching shopping list", e)
                 }
         }

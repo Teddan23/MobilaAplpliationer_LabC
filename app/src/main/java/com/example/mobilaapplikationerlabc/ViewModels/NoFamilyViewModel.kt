@@ -27,15 +27,13 @@ class NoFamilyViewModel(application: Application) : AndroidViewModel(application
             return
         }
 
-        // Skapa Family-objektet med aktuell användare som första medlem
         val family = Family(
             name = name,
-            members = listOf(currentUser.uid), // Användarens UID läggs till som första medlem
-            recipes = listOf(),           // Tom lista med recept
-            shoppingList = listOf()       // Tom inköpslista
+            members = listOf(currentUser.uid),
+            recipes = listOf(),
+            shoppingList = listOf()
         )
 
-        // Lägger till familjen i Firestore (ID genereras automatiskt)
         db.collection("families")
             .add(family)
             .addOnSuccessListener {
@@ -62,11 +60,9 @@ class NoFamilyViewModel(application: Application) : AndroidViewModel(application
                     if (document.exists()) {
                         val existingFamily = document.toObject(Family::class.java)
                         if (existingFamily != null) {
-                            // Uppdatera listan av medlemmar genom att lägga till användarens UID
                             val updatedMembers = existingFamily.members.toMutableList()
-                            updatedMembers.add(currentUser.uid)  // Lägg till användarens UID till listan
+                            updatedMembers.add(currentUser.uid)
 
-                            // Uppdatera familjedokumentet i Firestore
                             db.collection("families").document(familyId)
                                 .update("members", updatedMembers)
                                 .addOnSuccessListener {
@@ -99,13 +95,10 @@ class NoFamilyViewModel(application: Application) : AndroidViewModel(application
         if (user != null) {
             val userRef = db.collection("users").document(user.uid)
 
-            // Kolla om användaren redan finns i databasen
             userRef.get().addOnSuccessListener { document ->
                 if (document.exists()) {
-                    // Användaren finns redan i databasen
                     Log.d("Firestore", "User already exists in the database")
                 } else {
-                    // Användaren finns inte, så vi lägger till dem
                     val userMap = hashMapOf(
                         "name" to user.displayName,
                         "email" to user.email

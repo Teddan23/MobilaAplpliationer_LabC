@@ -42,10 +42,11 @@ fun FamilyCartScreen(
 ) {
     val shoppingList = familyCartViewModel.shoppingListFlow.collectAsState().value
 
-    var showDialog by remember { mutableStateOf(false) }  // Styr om dialogen ska visas
+    var showDialog by remember { mutableStateOf(false) }
     var newItem by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Kör metoden för att hämta data när skärmen öppnas
+    val isLoading by familyCartViewModel.isLoading.collectAsState()
+
     LaunchedEffect(Unit) {
         familyCartViewModel.fetchShoppingList()
     }
@@ -56,14 +57,12 @@ fun FamilyCartScreen(
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Centrera texten i Box
                         Text(
                             text = "Shopping List",
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.align(Alignment.Center)
                         )
 
-                        // Placera navigation-ikonen till vänster
                         IconButton(
                             onClick = { navController.popBackStack() },
                             modifier = Modifier.align(Alignment.CenterStart)
@@ -75,8 +74,17 @@ fun FamilyCartScreen(
             )
         },
         content = { paddingValues ->
-            if (shoppingList.isEmpty()) {
-                // Visa ett meddelande om listan är tom
+            if(isLoading){
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            else if (shoppingList.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -86,12 +94,11 @@ fun FamilyCartScreen(
                     Text(text = "No items in the shopping list.")
                 }
             } else {
-                // Visa shoppinglistan
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(16.dp) // Extra padding inuti
+                        .padding(16.dp)
                 ) {
                     items(shoppingList) { item ->
                         Row(
@@ -103,13 +110,13 @@ fun FamilyCartScreen(
                             Text(
                                 text = item,
                                 style = MaterialTheme.typography.headlineSmall,
-                                modifier = Modifier.weight(1f) // Fyller upp tillgängligt utrymme
+                                modifier = Modifier.weight(1f)
                             )
 
                             Button(
                                 onClick = { familyCartViewModel.removeItem(item) },
                                 modifier = Modifier.padding(start = 8.dp),
-                                shape = RoundedCornerShape(4.dp), // Lätt avrundade hörn med radie 4dp
+                                shape = RoundedCornerShape(4.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                             ) {
                                 Icon(
@@ -127,9 +134,9 @@ fun FamilyCartScreen(
             Button(
                 onClick = { showDialog = true },
                 modifier = Modifier
-                    .fillMaxWidth() // Täcker hela bredden
-                    .height(80.dp), // Sätter höjden för bottomBar-knappen
-                shape = RectangleShape, // Fyrkantig form utan rundade hörn
+                    .fillMaxWidth()
+                    .height(80.dp),
+                shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Icon(
@@ -156,9 +163,9 @@ fun FamilyCartScreen(
                 Button(
                     onClick = {
                         if (newItem.text.isNotBlank()) {
-                            familyCartViewModel.addItem(newItem.text)  // Lägg till varan
-                            newItem = TextFieldValue("")  // Rensa textfältet
-                            showDialog = false  // Stäng dialogen
+                            familyCartViewModel.addItem(newItem.text)
+                            newItem = TextFieldValue("")
+                            showDialog = false
                         }
                     }
                 ) {

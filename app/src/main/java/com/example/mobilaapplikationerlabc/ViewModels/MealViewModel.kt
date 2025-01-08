@@ -1,6 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobilaapplikationerlabc.MealToFirebase.RecipeRepository
+import com.example.mobilaapplikationerlabc.MealToFirebase.RecipeModel
 import com.example.mobilaapplikationerlabc.model.Meal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -8,40 +8,43 @@ import kotlinx.coroutines.launch
 
 class MealViewModel : ViewModel() {
 
-    private val recipeRepository = RecipeRepository()
+    private val recipeModel = RecipeModel()
 
     private val _isMealFavorite = MutableStateFlow(false)
     val isMealFavorite: StateFlow<Boolean> = _isMealFavorite
 
-    // Metod för att spara måltider från API till Firestore
     fun saveMeal(meal: Meal) {
-            // När du har fått svaret, spara alla måltider
-            recipeRepository.saveMeal(meal)
+            recipeModel.saveMeal(meal)
     }
 
     fun removeMeal(mealId: String){
-        recipeRepository.removeMealFromFamily(mealId)
+        recipeModel.removeMealFromFamily(mealId)
     }
 
     fun checkIfMealIsInFamily(mealId: String) {
         viewModelScope.launch {
-            recipeRepository.isMealInFamily(mealId) { isInFamily ->
+            recipeModel.isMealInFamily(mealId) { isInFamily ->
                 _isMealFavorite.value = isInFamily
             }
         }
     }
 
     fun removeFromFavorites(meal: Meal) {
-        recipeRepository.removeMealFromFamily(meal.idMeal)
+        recipeModel.removeMealFromFamily(meal.idMeal)
     }
 
     fun checkIfMealIsInFamily(mealId: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch {
-            recipeRepository.isMealInFamily(mealId) { isInFamily ->
+            recipeModel.isMealInFamily(mealId) { isInFamily ->
                 callback(isInFamily)
             }
         }
     }
+
+
+
+
+
 
 
 

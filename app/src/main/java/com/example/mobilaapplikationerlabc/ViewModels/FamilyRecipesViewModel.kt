@@ -17,38 +17,43 @@ class FamilyRecipesViewModel(application: Application) : AndroidViewModel(applic
     private val db = FirebaseFirestore.getInstance()
     private val _recipesFlow = MutableStateFlow<List<SimpleMeal>>(emptyList())
     val recipesFlow: StateFlow<List<SimpleMeal>> = _recipesFlow.asStateFlow()
-    private val auth = FirebaseAuth.getInstance() // Definieras här som instansvariabel
+    private val auth = FirebaseAuth.getInstance()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
 
     fun fetchFamilyRecipes() {
-        val userId = auth.currentUser?.uid ?: return // Hämta nuvarande användarens ID
-        // Hämta alla familjer där användaren är medlem
+        _isLoading.value = true
+        val userId = auth.currentUser?.uid ?: return
         db.collection("families")
-            .whereArrayContains("members", userId)  // Filtrera på familjer där "members" innehåller användarens UID
+            .whereArrayContains("members", userId)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
-                    // Hämta den första familjen som matchar användarens UID
                     val familyDocument = querySnapshot.documents[0]
                     val recipeIds = familyDocument["recipes"] as? List<String> ?: emptyList()
 
                     if (recipeIds.isNotEmpty()) {
                         fetchRecipesByIds(recipeIds)
                     } else {
-                        _recipesFlow.value = emptyList() // Ingen recept för familjen
+                        _recipesFlow.value = emptyList()
+                        _isLoading.value = false
                     }
                 } else {
                     Log.e("FamilyRecipesViewModel", "User is not part of any family")
-                    _recipesFlow.value = emptyList() // Om användaren inte är med i någon familj
+                    _recipesFlow.value = emptyList()
+                    _isLoading.value = false
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("FamilyRecipesViewModel", "Error fetching family document", e)
+                _isLoading.value = false
             }
     }
 
     private fun fetchRecipesByIds(recipeIds: List<String>) {
         db.collection("recipes")
-            .whereIn(FieldPath.documentId(), recipeIds) // Hämta dokument med de specifika ID:n
+            .whereIn(FieldPath.documentId(), recipeIds)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val meals = querySnapshot.documents
@@ -57,19 +62,18 @@ class FamilyRecipesViewModel(application: Application) : AndroidViewModel(applic
                         val strMeal = document["strMeal"] as? String
                         val idMeal = document.id
                         if (strCategory != null && strMeal != null) {
-                            SimpleMeal(idMeal, strCategory, strMeal) // Skapa en enklare representation av Meal
+                            SimpleMeal(idMeal, strCategory, strMeal)
                         } else {
-                            null // Om nödvändiga fält saknas, ignorera dokumentet
+                            null
                         }
                     }
                 _recipesFlow.value = meals
+                _isLoading.value = false
             }
             .addOnFailureListener { e ->
                 Log.e("FamilyRecipesViewModel", "Error fetching recipes by IDs", e)
+                _isLoading.value = false
             }
     }
-
-    // Konverteringsfunktion från SimpleMeal till Mea
-
 
 }

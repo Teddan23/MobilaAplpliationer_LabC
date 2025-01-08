@@ -22,26 +22,27 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: MealViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-    // Ladda måltiden baserat på mealId (vi använder Retrofit för att hämta detaljer)
     var meal by remember { mutableStateOf<Meal?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isFavorite by remember { mutableStateOf(false) }
 
-    // Setup Retrofit (som tidigare)
     val retrofit = Retrofit.Builder()
         .baseUrl("https://www.themealdb.com/api/json/v1/1/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val service = retrofit.create(TheMealDBService::class.java)
 
-    // Hämtar måltiden baserat på mealId
     LaunchedEffect(mealId) {
         service.getMealDetails(mealId).enqueue(object : Callback<MealResponse> {
             override fun onResponse(call: Call<MealResponse>, response: Response<MealResponse>) {
@@ -49,7 +50,7 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                     meal = response.body()?.meals?.firstOrNull()
                     meal?.let {
                         viewModel.checkIfMealIsInFamily(it.idMeal) { isInFamily ->
-                            isFavorite = isInFamily // Uppdatera om måltiden är i familjens lista direkt.
+                            isFavorite = isInFamily
                         }
                     }
                 } else {
@@ -65,25 +66,36 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
         })
     }
 
-    // UI content for MealDetailScreen
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Meal Details") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Meal Details",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )
-        },
+        }
+,
         content = { contentPadding ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding)
-                    .padding(16.dp), // Extra padding för innehållet
-                verticalArrangement = Arrangement.spacedBy(16.dp) // Lägger till avstånd mellan items
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (isLoading) {
                     item {
@@ -95,7 +107,6 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                     }
                 } else if (meal != null) {
                     meal?.let { mealDetails ->
-                        // Bild på måltiden
 
                         mealDetails.strMealThumb?.let { imageUrl ->
                             item {
@@ -109,12 +120,32 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                             }
                         }
 
-                        //Favorite button
-                        // Favorite button
                         item {
-                            //val isFavorite by viewModel.isMealFavorite.collectAsState(initial = false)
-
                             Button(
+                                onClick = {
+                                    if (isFavorite) {
+                                        viewModel.removeFromFavorites(mealDetails)
+                                    } else {
+                                        viewModel.saveMeal(mealDetails)
+                                    }
+                                    isFavorite = !isFavorite
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isFavorite) MaterialTheme.colorScheme.error else Color.DarkGray
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Clear else Icons.Filled.Star,
+                                    contentDescription = if (isFavorite) "Remove from Favorites" else "Add to Favorites",
+                                    modifier = Modifier.size(45.dp),
+                                    tint = if (isFavorite) Color.White else Color.Yellow
+                                )
+                            }
+
+
+                            /*Button(
                                 onClick = {
                                     if (isFavorite) {
                                         // Om måltiden är i favoriter, ta bort den från familjens lista
@@ -134,11 +165,9 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                                 Text(
                                     text = if (isFavorite) "Remove from Favorites" else "Add to Favorites"
                                 )
-                            }
+                            }*/
                         }
 
-
-                        // Namnet på måltiden
                         item {
                             Text(
                                 text = mealDetails.strMeal,
@@ -146,7 +175,6 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                             )
                         }
 
-                        // Kategori
                         item {
                             Text(
                                 text = "Category: ${mealDetails.strCategory ?: "Unknown"}",
@@ -154,11 +182,10 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                             )
                         }
 
-                        // Instruktioner
                         item {
                             Text(
                                 text = "Instructions:",
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.titleLarge
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
@@ -166,11 +193,10 @@ fun MealDetailScreen(mealId: String, navController: NavController,  viewModel: M
                             )
                         }
 
-                        // Ingredienser och mått
                         item {
                             Text(
                                 text = "Ingredients:",
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.titleLarge
                             )
                         }
 

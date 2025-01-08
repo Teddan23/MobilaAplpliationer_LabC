@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Skapa ViewModel via factory
         val factory = LoginViewModelFactory(application)
         loginViewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
 

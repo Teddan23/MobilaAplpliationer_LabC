@@ -29,7 +29,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun RandomScreen(navController: NavController) {
 
-    // Setup Retrofit
     val retrofit = Retrofit.Builder()
         .baseUrl("https://www.themealdb.com/api/json/v1/1/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -37,12 +36,10 @@ fun RandomScreen(navController: NavController) {
 
     val service = retrofit.create(TheMealDBService::class.java)
 
-    // State for holding meal data
     var meal by remember { mutableStateOf<Meal?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Fetch random meal from API
     LaunchedEffect(Unit) {
         service.getRandomMeal().enqueue(object : Callback<MealResponse> {
             override fun onResponse(call: Call<MealResponse>, response: Response<MealResponse>) {
@@ -62,20 +59,31 @@ fun RandomScreen(navController: NavController) {
     }
 
 
-    // UI
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Random Meal") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Random Meal",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )
-        },
-        // REMOVE the contentPadding parameter completely, we handle padding manually
-        content = { paddingValues -> // Use paddingValues directly here
+        }
+,
+        content = { paddingValues ->
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.fillMaxSize())
             } else if (errorMessage != null) {
@@ -91,7 +99,6 @@ fun RandomScreen(navController: NavController) {
 
 @Composable
 fun RandomMealContent(meal: Meal, paddingValues: PaddingValues) {
-    // Skapa listan av ingredienser och deras mått
     val ingredientsAndMeasures = listOf(
         meal.strIngredient1 to meal.strMeasure1,
         meal.strIngredient2 to meal.strMeasure2,
@@ -134,27 +141,22 @@ fun RandomMealContent(meal: Meal, paddingValues: PaddingValues) {
             )
         }
 
-        // Meal Name
         item {
             Text(text = meal.strMeal, style = MaterialTheme.typography.headlineMedium)
         }
 
-        // Category
         item {
             Text(text = "Category: ${meal.strCategory}")
         }
 
-        // Instructions
         item {
             Text(text = "Instructions: ${meal.strInstructions}", modifier = Modifier.padding(8.dp))
         }
 
-        // Ingredients Header
         item {
             Text(text = "Ingredients:", style = MaterialTheme.typography.bodyLarge)
         }
 
-        // Ingredients and Measures
         items(ingredientsAndMeasures) { ingredientAndMeasure ->
             val (ingredient, measure) = ingredientAndMeasure
             ingredient?.takeIf { it.isNotBlank() }?.let { nonNullIngredient ->
