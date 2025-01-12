@@ -1,32 +1,32 @@
 package com.example.mobilaapplikationerlabc.ViewModels
 
 import androidx.lifecycle.ViewModel
-import com.example.mobilaapplikationerlabc.Models.HomeModel
+import com.example.mobilaapplikationerlabc.Repositories.HomeRepository
 
 class HomePageViewModel : ViewModel() {
 
-    private val homeModel = HomeModel()
+    private val homeRepository = HomeRepository()
 
     val isUserLoggedIn: Boolean
-        get() = homeModel.isUserLoggedIn
+        get() = homeRepository.isUserLoggedIn
 
     fun getUserName(): String {
-        return homeModel.getUserName()
+        return homeRepository.getUserName()
     }
 
     fun getEmail(): String {
-        return homeModel.getEmail()
+        return homeRepository.getEmail()
     }
 
     fun checkIfInFamily(onComplete: (Boolean) -> Unit) {
-        homeModel.checkIfInFamily(onComplete)
+        homeRepository.checkIfInFamily(onComplete)
     }
 
     fun addUserToDbIfNeeded() {
-        homeModel.addUserToDbIfNeeded()
+        homeRepository.addUserToDbIfNeeded()
     }
 
     fun signOut() {
-        homeModel.signOut()
+        homeRepository.signOut()
     }
 }

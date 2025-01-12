@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobilaapplikationerlabc.DataClasses.Family
-import com.example.mobilaapplikationerlabc.Models.FamilyModel
+import com.example.mobilaapplikationerlabc.Repositories.FamilyRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class FamilyViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val familyModel = FamilyModel()
+    private val familyRepository = FamilyRepository()
 
     private val _familyFlow = MutableStateFlow<Family?>(null)
     val familyFlow: StateFlow<Family?> = _familyFlow.asStateFlow()
@@ -29,7 +29,7 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchCurrentUserFamily() {
         viewModelScope.launch {
             _isLoading.value = true
-            val (family, documentId) = familyModel.fetchCurrentUserFamily()
+            val (family, documentId) = familyRepository.fetchCurrentUserFamily()
             _familyFlow.value = family
             _documentIdFlow.value = documentId
             _isLoading.value = false
@@ -39,7 +39,7 @@ class FamilyViewModel(application: Application) : AndroidViewModel(application) 
     fun leaveFamily() {
         viewModelScope.launch {
             _isLoading.value = true
-            val success = familyModel.leaveFamily()
+            val success = familyRepository.leaveFamily()
             _leaveFamilySuccess.value = success
             _isLoading.value = false
         }

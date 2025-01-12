@@ -1,4 +1,4 @@
-package com.example.mobilaapplikationerlabc.Models
+package com.example.mobilaapplikationerlabc.Repositories
 
 import android.util.Log
 import com.example.mobilaapplikationerlabc.model.Meal

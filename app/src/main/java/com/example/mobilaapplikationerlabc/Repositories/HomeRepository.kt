@@ -1,10 +1,10 @@
-package com.example.mobilaapplikationerlabc.Models
+package com.example.mobilaapplikationerlabc.Repositories
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class HomeModel {
+class HomeRepository {
 
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()

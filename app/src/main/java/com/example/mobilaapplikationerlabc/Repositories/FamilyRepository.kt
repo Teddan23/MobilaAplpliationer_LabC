@@ -1,4 +1,4 @@
-package com.example.mobilaapplikationerlabc.Models
+package com.example.mobilaapplikationerlabc.Repositories
 
 import android.util.Log
 import com.example.mobilaapplikationerlabc.DataClasses.Family
@@ -6,7 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-class FamilyModel {
+class FamilyRepository {
 
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
