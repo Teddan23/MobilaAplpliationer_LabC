@@ -1,104 +1,47 @@
 package com.example.mobilaapplikationerlabc.ViewModels
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mobilaapplikationerlabc.DataClasses.Family
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.mobilaapplikationerlabc.Models.FamilyModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class FamilyViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val familyModel = FamilyModel()
 
     private val _familyFlow = MutableStateFlow<Family?>(null)
     val familyFlow: StateFlow<Family?> = _familyFlow.asStateFlow()
 
+    private val _documentIdFlow = MutableStateFlow<String?>(null)
+    val documentIdFlow: StateFlow<String?> = _documentIdFlow.asStateFlow()
+
     private val _leaveFamilySuccess = MutableStateFlow(false)
     val leaveFamilySuccess: StateFlow<Boolean> = _leaveFamilySuccess.asStateFlow()
 
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
-
-    private val _documentIdFlow = MutableStateFlow<String?>(null)
-    val documentIdFlow: StateFlow<String?> = _documentIdFlow
-
-    private val _isLoading = MutableStateFlow(true)
+    private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     fun fetchCurrentUserFamily() {
-        _isLoading.value = true
-        val currentUserId = auth.currentUser?.uid ?: return
-
-        val db = FirebaseFirestore.getInstance()
-        db.collection("families")
-            .whereArrayContains("members", currentUserId)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                _isLoading.value = false
-                if (!querySnapshot.isEmpty) {
-                    val familyDocument = querySnapshot.documents[0]
-                    val family = querySnapshot.documents[0].toObject(Family::class.java)
-                    family?.let {
-                        _familyFlow.value = it
-                        _documentIdFlow.value = familyDocument.id
-                    }
-                }
-            }
-            .addOnFailureListener {
-                _isLoading.value = false
-                _familyFlow.value = null
-                _documentIdFlow.value = null
-            }
-    }
-
-    fun leaveFamily() {
-        val currentUserId = auth.currentUser?.uid ?: return
-        val family = _familyFlow.value
-
-        family?.let {
-            db.collection("families")
-                .whereArrayContains("members", currentUserId)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    if (!querySnapshot.isEmpty) {
-                        val familyDocument = querySnapshot.documents[0]
-                        val familyId = familyDocument.id
-                        val updatedMembers = it.members.toMutableList()
-
-                        if (it.members.size == 1) {
-                            db.collection("families")
-                                .document(familyId)
-                                .delete()
-                                .addOnSuccessListener {
-                                    _leaveFamilySuccess.value = true
-                                    Log.d("FamilyViewModel", "Family deleted as the last member left.")
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e("FamilyViewModel", "Error deleting family", e)
-                                }
-                        }
-                        else{
-                            updatedMembers.remove(currentUserId)
-
-                            db.collection("families")
-                                .document(familyId)
-                                .update("members", updatedMembers)
-                                .addOnSuccessListener {
-
-                                    _leaveFamilySuccess.value = true
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e("FamilyViewModel", "Error leaving family", e)
-                                }
-                        }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("FamilyViewModel", "Error fetching family document", e)
-                }
+        viewModelScope.launch {
+            _isLoading.value = true
+            val (family, documentId) = familyModel.fetchCurrentUserFamily()
+            _familyFlow.value = family
+            _documentIdFlow.value = documentId
+            _isLoading.value = false
         }
     }
 
+    fun leaveFamily() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val success = familyModel.leaveFamily()
+            _leaveFamilySuccess.value = success
+            _isLoading.value = false
+        }
+    }
 }

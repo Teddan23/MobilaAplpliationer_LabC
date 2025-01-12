@@ -1,4 +1,4 @@
-package com.example.mobilaapplikationerlabc.MealToFirebase
+package com.example.mobilaapplikationerlabc.Models
 
 import android.util.Log
 import com.example.mobilaapplikationerlabc.model.Meal

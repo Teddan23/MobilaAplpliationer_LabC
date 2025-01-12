@@ -1,6 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobilaapplikationerlabc.MealToFirebase.RecipeModel
+import com.example.mobilaapplikationerlabc.Models.RecipeModel
 import com.example.mobilaapplikationerlabc.model.Meal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
