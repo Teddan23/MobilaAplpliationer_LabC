@@ -5,7 +5,7 @@ import com.example.mobilaapplikationerlabc.model.Meal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class RecipeModel {
+class MealRepository {
 
     private val db = FirebaseFirestore.getInstance()
 

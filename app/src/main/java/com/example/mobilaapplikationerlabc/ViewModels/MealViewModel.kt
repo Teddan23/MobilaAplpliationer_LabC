@@ -1,6 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobilaapplikationerlabc.Repositories.RecipeModel
+import com.example.mobilaapplikationerlabc.Repositories.MealRepository
 import com.example.mobilaapplikationerlabc.model.Meal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -8,34 +8,34 @@ import kotlinx.coroutines.launch
 
 class MealViewModel : ViewModel() {
 
-    private val recipeModel = RecipeModel()
+    private val mealRepository = MealRepository()
 
     private val _isMealFavorite = MutableStateFlow(false)
     val isMealFavorite: StateFlow<Boolean> = _isMealFavorite
 
     fun saveMeal(meal: Meal) {
-            recipeModel.saveMeal(meal)
+            mealRepository.saveMeal(meal)
     }
 
     fun removeMeal(mealId: String){
-        recipeModel.removeMealFromFamily(mealId)
+        mealRepository.removeMealFromFamily(mealId)
     }
 
     fun checkIfMealIsInFamily(mealId: String) {
         viewModelScope.launch {
-            recipeModel.isMealInFamily(mealId) { isInFamily ->
+            mealRepository.isMealInFamily(mealId) { isInFamily ->
                 _isMealFavorite.value = isInFamily
             }
         }
     }
 
     fun removeFromFavorites(meal: Meal) {
-        recipeModel.removeMealFromFamily(meal.idMeal)
+        mealRepository.removeMealFromFamily(meal.idMeal)
     }
 
     fun checkIfMealIsInFamily(mealId: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch {
-            recipeModel.isMealInFamily(mealId) { isInFamily ->
+            mealRepository.isMealInFamily(mealId) { isInFamily ->
                 callback(isInFamily)
             }
         }
