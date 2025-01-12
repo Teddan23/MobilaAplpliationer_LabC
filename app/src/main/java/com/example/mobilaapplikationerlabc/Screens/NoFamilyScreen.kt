@@ -113,7 +113,7 @@ fun NoFamilyScreen(navController: NavController, noFamilyViewModel: NoFamilyView
                                 Toast.makeText(context, "Successfully joined family!", Toast.LENGTH_SHORT).show()
                                 navController.popBackStack()
                             } else {
-                                Toast.makeText(context, "Failed to join family", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Could not join family", Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
